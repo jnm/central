@@ -5,7 +5,8 @@ RUN files/prebuild/write-version.sh
 RUN files/prebuild/build-frontend.sh
 
 
-FROM staticfloat/nginx-certbot:latest
+# FROM staticfloat/nginx-certbot:latest
+FROM nginx
 
 EXPOSE 80
 EXPOSE 443
@@ -16,7 +17,7 @@ ENTRYPOINT [ "/bin/bash", "/scripts/odk-setup.sh" ]
 RUN apt-get update; apt-get install -y openssl netcat
 
 RUN mkdir -p /etc/selfsign/live/local
-COPY files/nginx/odk-setup.sh /scripts
+COPY files/nginx/odk-setup.sh /scripts/
 
 COPY files/local/customssl/*.pem /etc/customssl/live/local/
 
