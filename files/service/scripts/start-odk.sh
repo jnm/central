@@ -1,3 +1,9 @@
+# NOCOMMIT
+echo "making schtuff"
+make
+###
+
+make
 CONFIG_PATH=/usr/odk/config/local.json
 if [ ! -e "$CONFIG_PATH" ]
 then
@@ -20,7 +26,11 @@ else
 fi
 echo "using $WORKER_COUNT worker(s) based on available memory ($MEMTOT).."
 
-echo "starting server."
-mkdir -p /var/log/odk
-node node_modules/naught/lib/main.js start --remove-old-ipc true --worker-count $WORKER_COUNT --daemon-mode false --log /var/log/odk/naught.log --stdout /var/log/odk/stdout.log --stderr /var/log/odk/stderr.log lib/bin/run-server.js
+# echo "starting server."
+# mkdir -p /var/log/odk
+# node node_modules/naught/lib/main.js start --remove-old-ipc true --worker-count $WORKER_COUNT --daemon-mode false --log /var/log/odk/naught.log --stdout /var/log/odk/stdout.log --stderr /var/log/odk/stderr.log lib/bin/run-server.js
 
+# NOCOMMIT
+echo "whoop de do"
+make debug
+###

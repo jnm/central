@@ -1,2 +1,3 @@
 0 2 * * * root /usr/odk/run-backup.sh
 0 1 * * 0 root /usr/odk/reap-sessions.sh
+0 0 * * * root /usr/odk/reap-preview_keys.sh

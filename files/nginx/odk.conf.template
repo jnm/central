@@ -1,4 +1,6 @@
 server {
+  # NOCOMMIT listen on plain http so enketo won't freak out about the self-signed cert
+  listen 80;
   listen 443 ssl;
   ssl_certificate /etc/${SSL_TYPE}/live/${DOMAIN}/fullchain.pem;
   ssl_certificate_key /etc/${SSL_TYPE}/live/${DOMAIN}/privkey.pem;

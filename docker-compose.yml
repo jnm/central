@@ -3,7 +3,7 @@ services:
   postgres:
     image: "postgres:9.6"
     volumes:
-      - /var/lib/postgresql/data
+      - ./files/postgres:/var/lib/postgresql/data
     environment:
       POSTGRES_USER: odk
       POSTGRES_PASSWORD: odk
@@ -26,8 +26,12 @@ services:
       - mail
     volumes:
       - /data/transfer:/data/transfer
+      # NOCOMMIT
+      - ./server:/usr/odk
     environment:
       - DOMAIN=${DOMAIN}
+    ports:
+      - "9229:9229"
     command: [ "./wait-for-it.sh", "postgres:5432", "--", "./start-odk.sh" ]
   nginx:
     container_name: nginx
@@ -43,11 +47,60 @@ services:
     ports:
       - "80:80"
       - "443:443"
+    volumes:
+        - ./files/nginx/selfsign:/etc/selfsign
+        - ./files/nginx/html:/usr/share/nginx/html
     healthcheck:
       test: [ "CMD-SHELL", "nc -z localhost 443 || exit 1" ]
   pyxform:
     container_name: pyxform
     image: 'yanokwa/pyxform-http:v0.3.0'
+
+  client-builder:
+    container_name: client-builder
+    build:
+      context: .
+      dockerfile: client-builder.dockerfile
+    volumes:
+      - ./client:/tmp/client
+      - ./files/nginx/html:/tmp/html
+
+  enketo:
+    container_name: enketo
+    #image: 62b0bc8722d8
+    build: /home/john/Documents/kobo/dockdev/enketo-express/
+    depends_on:
+      - enketo_redis_main
+      - enketo_redis_cache
+    volumes:
+      # this ain't gonna work for config
+      - ./files/enketo/config.json:/srv/src/enketo_express/config/config.json
+      - ./files/enketo/checksum:/srv/src/enketo_express/checksum
+      - ./files/enketo/build/css:/srv/src/enketo_express/public/css
+      - ./files/enketo/build/js:/srv/src/enketo_express/public/js/build
+      - ./files/enketo/build/locales:/srv/src/enketo_express/locales/build
+      - ./files/enketo/secrets:/srv/src/enketo_express/setup/docker/secrets
+    ports:
+      - "8005:8005"
+    restart: unless-stopped
+    # this shit is fucking bonkers cp /srv/tmp/enketo_express_config.json ${ENKETO_SRC_DIR}/config/config.json
+  enketo_redis_main:
+    container_name: enketo_redis_main
+    image: redis:5
+    volumes:
+      # hmm??? - ../redis/conf/redis-enketo-main.conf:/etc/redis/redis.conf:ro
+      - ./files/enketo/redis_main:/data/
+    restart: unless-stopped
+  enketo_redis_cache:
+    container_name: enketo_redis_cache
+    image: redis:5
+    volumes:
+      # hmm??? - ../redis/conf/redis-enketo-cache.conf:/etc/redis/redis.conf:ro
+      - ./files/enketo/redis_cache:/data/
+    restart: unless-stopped
+    env_file:
+      - .env
+
 volumes:
   transfer:
 
